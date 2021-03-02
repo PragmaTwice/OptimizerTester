@@ -16,6 +16,7 @@ type Option struct {
 	User     string `toml:"user"`
 	Password string `toml:"password"`
 	Label    string `toml:"label"`
+	InitExec string `toml:"init-exec"`
 }
 
 type Instance interface {
@@ -112,5 +113,12 @@ func ConnectTo(opt Option) (Instance, error) {
 	}
 	ins := &instance{db: db, opt: opt}
 	db.SetMaxOpenConns(256)
+
+	if opt.InitExec != "" {
+		if err := ins.Exec(opt.InitExec); err != nil {
+			return nil, errors.Trace(err)
+		}
+	}
+
 	return ins, ins.initVersion()
 }
