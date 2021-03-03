@@ -64,6 +64,7 @@ func (ins *instance) Close() error {
 }
 
 func (ins *instance) initVersion() error {
+	println("initVersion", 1)
 	rows, err := ins.Query(`SELECT VERSION()`)
 	if err != nil {
 		return err
@@ -76,6 +77,7 @@ func (ins *instance) initVersion() error {
 	}
 	tmp := strings.Split(version, "-")
 	ins.ver = tmp[2]
+	println("initVersion", 2)
 	return nil
 }
 

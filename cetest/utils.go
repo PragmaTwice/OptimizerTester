@@ -11,11 +11,13 @@ import (
 )
 
 func getEstRowFromExplain(ins tidb.Instance, query string) (estRow float64, re error) {
+	println("gERFE", 1)
 	sql := "EXPLAIN " + query
 	rows, err := ins.Query(sql)
 	if err != nil {
 		return 0, fmt.Errorf("run sql=%v, err=%v", sql, err)
 	}
+	println("gERFE", 2)
 	defer func() {
 		if err := rows.Close(); err != nil && re == nil {
 			re = err
@@ -26,6 +28,7 @@ func getEstRowFromExplain(ins tidb.Instance, query string) (estRow float64, re e
 	if err != nil {
 		return 0, err
 	}
+	println("gERFE", 3)
 	nCols := len(types)
 	results := make([][]string, 0, 8)
 	for rows.Next() {
@@ -39,6 +42,7 @@ func getEstRowFromExplain(ins tidb.Instance, query string) (estRow float64, re e
 		}
 		results = append(results, cols)
 	}
+	println("gERFE", 4)
 
 	return ExtractEstRows(results, ins.Version())
 }

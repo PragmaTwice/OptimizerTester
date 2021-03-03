@@ -1,0 +1,26 @@
+query-types = ["mul-cols-range-query-on-index", "mul-cols-point-query-on-index"]
+report-dir = "."
+analyze-tables = ["test.tint"]
+n-samples = 10000
+
+[[datasets]]
+name = "zipfx"
+db = "test"
+label = "zipf-1.5"
+
+[[instances]]
+addr = "172.16.6.39"
+port = 49187
+user = "root"
+password = ""
+label = "v1"
+init-exec = "set tidb_analyze_version = 1"
+
+[[instances]]
+addr = "172.16.5.71"
+port = 32833
+user = "root"
+password = ""
+label = "v2"
+init-exec = "set tidb_analyze_version = 2"
+
