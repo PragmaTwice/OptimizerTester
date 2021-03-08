@@ -7,6 +7,7 @@ import (
 	"os"
 	"path"
 	"sort"
+	"encoding/json"
 
 	"github.com/pingcap/errors"
 	"gonum.org/v1/plot"
@@ -15,9 +16,17 @@ import (
 	"gonum.org/v1/plot/vg"
 )
 
+type Stats struct {
+	Qt string `json:"type"`
+	Ds string `json:"dataset"`
+	Ins string `json:"instance"`
+	Stats map[string]string `json:"stats"`
+}
+
 // GenPErrorBarChartsReport ...
 func GenPErrorBarChartsReport(opt Option, collector EstResultCollector) error {
 	md := bytes.Buffer{}
+	res := []Stats{}
 	for qtIdx, qt := range opt.QueryTypes {
 		md.WriteString(fmt.Sprintf("# %v\n", qt))
 		for dsIdx, ds := range opt.Datasets {
@@ -35,6 +44,7 @@ func GenPErrorBarChartsReport(opt Option, collector EstResultCollector) error {
 				stats := analyzePError(collector.EstResults(insIdx, dsIdx, qtIdx), true)
 				md.WriteString(fmt.Sprintf("| %v | %v | %v | %v | %v | %v |\n",
 					ins.Label, stats["tot"], stats["p50"], stats["p90"], stats["p99"], stats["max"]))
+				res = append(res, Stats{fmt.Sprintf("%v", qt), ds.Label, ins.Label, stats})
 			}
 
 			md.WriteString("\nUnderEstimation Statistics\n")
@@ -48,6 +58,17 @@ func GenPErrorBarChartsReport(opt Option, collector EstResultCollector) error {
 			md.WriteString("\n")
 		}
 	}
+
+	json, err := json.Marshal(res)
+	if err != nil {
+		return err
+	}
+
+	err = ioutil.WriteFile(path.Join(opt.ReportDir, "report.json"), json, 0666)
+	if err != nil {
+		return err
+	}
+
 	return ioutil.WriteFile(path.Join(opt.ReportDir, "report.md"), md.Bytes(), 0666)
 }
 
