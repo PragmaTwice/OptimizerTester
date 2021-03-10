@@ -19,6 +19,7 @@ import (
 type Stats struct {
 	Qt string `json:"type"`
 	Ds string `json:"dataset"`
+	Est string `json:"estimation"`
 	Ins string `json:"instance"`
 	Stats map[string]string `json:"stats"`
 }
@@ -44,7 +45,7 @@ func GenPErrorBarChartsReport(opt Option, collector EstResultCollector) error {
 				stats := analyzePError(collector.EstResults(insIdx, dsIdx, qtIdx), true)
 				md.WriteString(fmt.Sprintf("| %v | %v | %v | %v | %v | %v |\n",
 					ins.Label, stats["tot"], stats["p50"], stats["p90"], stats["p99"], stats["max"]))
-				res = append(res, Stats{fmt.Sprintf("%v", qt), ds.Label, ins.Label, stats})
+				res = append(res, Stats{fmt.Sprintf("%v", qt), ds.Label, "over", ins.Label, stats})
 			}
 
 			md.WriteString("\nUnderEstimation Statistics\n")
@@ -54,6 +55,7 @@ func GenPErrorBarChartsReport(opt Option, collector EstResultCollector) error {
 				stats := analyzePError(collector.EstResults(insIdx, dsIdx, qtIdx), false)
 				md.WriteString(fmt.Sprintf("| %v | %v | %v | %v | %v | %v |\n",
 					ins.Label, stats["tot"], stats["p50"], stats["p90"], stats["p99"], stats["max"]))
+				res = append(res, Stats{fmt.Sprintf("%v", qt), ds.Label, "under", ins.Label, stats})
 			}
 			md.WriteString("\n")
 		}
